@@ -79,7 +79,7 @@ public class ControladorEstudiante {
 
             vista.mostrarExito("La materia ha sido dada de baja correctamente.", "Eliminación exitosa");
 
-            vista.actualizarListaMaterias();
+            vista.actualizarPantallaResumen();
 
         } catch (Exception e) {
             vista.mostrarError("Ocurrió un error inesperado al eliminar: " + e.getMessage());

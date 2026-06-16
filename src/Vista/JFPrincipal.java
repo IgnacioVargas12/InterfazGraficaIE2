@@ -3,11 +3,14 @@ package Vista;
 import javax.swing.DefaultListModel;
 import Controlador.ControladorEstudiante;
 import java.util.ArrayList;
+import javax.swing.JOptionPane;
+import javax.swing.table.DefaultTableModel;
+
+
 
 public class JFPrincipal extends javax.swing.JFrame {
     
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(JFPrincipal.class.getName());
-    private DefaultListModel<String> modeloListaMaterias;
     private Controlador.ControladorEstudiante controlador;
    
     public JFPrincipal() {
@@ -36,98 +39,41 @@ public class JFPrincipal extends javax.swing.JFrame {
         
         controlador = new ControladorEstudiante(this); 
         
-        // Inicializamos el modelo del JList
-        modeloListaMaterias = new DefaultListModel<>();
-        lstMaterias.setModel(modeloListaMaterias);
-        
     }
     
     public void actualizarTodo(){
         actualizarPantallaResumen();
-        actualizarListaMaterias();
-        actualizarListaAsistencias();
-        actualizarListaNotas();
-        actualizarListaConsulta();
     }
     
     public void actualizarPantallaResumen() {
-        // 1. Obtener el estudiante del controlador para los Labels
         Modelo.Estudiante est = controlador.getEstudiante();
 
         lblNombre.setText(est.GetNombre());
         lblLegajo.setText(est.getLegajo());
         lblCarrera.setText(est.getCarrera());
         lblAño.setText(String.valueOf(est.getAnioIngreso()));
-        //lstMaterias.setText("Materias Inscriptas: " + est.getMaterias().size());
 
-        // 2. Limpiar el modelo visual de la lista para evitar duplicados
-        modeloListaMaterias.clear();
-
-        // 3. AQUÍ VA EL FOR: La Vista recorre los datos del controlador
-        // y los adapta a sus componentes de Swing
-        ArrayList<Modelo.InscripcionMateria> inscripciones = controlador.getInscripciones();
-        for (Modelo.InscripcionMateria ins : inscripciones) {
-            // Extraemos el objeto Materia interno de la inscripción
-            Modelo.Materia materia = ins.getMateria();
-
-            // Armamos el texto que queremos ver en el JList (Ejemplo: "Programación II (PROG2)")
-            String itemTexto = materia.getNombre() + " (" + materia.getCodigo() + ")";
-
-            // Lo agregamos al modelo visual de la lista
-            modeloListaMaterias.addElement(itemTexto);
-        }
-    }
-    
-    public void actualizarListaMaterias() {
-        // Creamos el modelo que Swing necesita para manipular visualmente el JList
         DefaultListModel<String> modeloLista = new DefaultListModel<>();
 
-        // Le pedimos al controlador los nombres actualizados en memoria
         ArrayList<String> materias = controlador.obtenerNombresMaterias();
 
-        // Cargamos los nombres en el modelo
         for (String nombreMateria : materias) {
             modeloLista.addElement(nombreMateria);
         }
 
-        // Le asignamos el nuevo modelo a tu JList (reemplazá 'jListMateriasBaja' por el nombre de tu variable)
+        lstMaterias.setModel(modeloLista);
         JPBMlstMateria.setModel(modeloLista); 
-    }
-    
-    public void actualizarListaAsistencias(){
-        DefaultListModel<String> modeloAsistencia = new DefaultListModel<>();
-        ArrayList<String> materias = controlador.obtenerNombresMaterias();
-
-        for (String nombreMateria : materias) {
-            modeloAsistencia.addElement(nombreMateria);
-        }
-        JPRAlstMateria.setModel(modeloAsistencia);
-    }
-    
-    public void actualizarListaNotas(){
-        DefaultListModel<String> modeloNotas = new DefaultListModel<>();
-        ArrayList<String> materias = controlador.obtenerNombresMaterias();
-        for (String m : materias) { 
-            modeloNotas.addElement(m); 
-        }
-        JPRNlstMateria.setModel(modeloNotas);
-    }
-    
-    public void actualizarListaConsulta(){
-        DefaultListModel<String> modeloNotas = new DefaultListModel<>();
-        ArrayList<String> materias = controlador.obtenerNombresMaterias();
-        for (String m : materias) { 
-            modeloNotas.addElement(m); 
-        }
-        JlistMaterias.setModel(modeloNotas);
+        JPRAlstMateria.setModel(modeloLista);
+        JPRNlstMateria.setModel(modeloLista);
+        JlistMaterias.setModel(modeloLista);
     }
     
     public void mostrarError(String mensaje) {
-    javax.swing.JOptionPane.showMessageDialog(this, mensaje, "Error de Validación", javax.swing.JOptionPane.ERROR_MESSAGE);
+    JOptionPane.showMessageDialog(this, mensaje, "Error de Validación", javax.swing.JOptionPane.ERROR_MESSAGE);
     }
     
     public void mostrarExito(String mensaje, String titulo) {
-    javax.swing.JOptionPane.showMessageDialog(this, mensaje, titulo, javax.swing.JOptionPane.INFORMATION_MESSAGE);
+    JOptionPane.showMessageDialog(this, mensaje, titulo, javax.swing.JOptionPane.INFORMATION_MESSAGE);
     }
 
     @SuppressWarnings("unchecked")
@@ -983,6 +929,11 @@ public class JFPrincipal extends javax.swing.JFrame {
         JPanelContenedor.repaint();
         JPanelContenedor.revalidate();
         JMenuPrincipal.setVisible(true);
+        
+        JPInscribirsetxtNombre.setText("");
+        JPInscribirsetxtCodigo.setText("");
+        JPInscribirsenudCuatrimestre.setValue(1);
+        JPInscribirsetxtAño.setText("");
     }//GEN-LAST:event_JMItemMateriaActionPerformed
 
     private void JMIDarseBajaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_JMIDarseBajaActionPerformed
@@ -1001,6 +952,14 @@ public class JFPrincipal extends javax.swing.JFrame {
         JPanelContenedor.revalidate();
         JMenuPrincipal.setVisible(true);
         actualizarTodo();
+        
+        JlabelNota1.setText("");
+        JlabelNota2.setText("");
+        JlabelNota3.setText("");
+        JlabelNota4.setText("");
+        JlabelNota5.setText("");
+
+        JlblPromedio.setText("");
     }//GEN-LAST:event_JMIMateriaPromedioActionPerformed
 
     private void JMIBuscarMateriaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_JMIBuscarMateriaActionPerformed
@@ -1009,6 +968,8 @@ public class JFPrincipal extends javax.swing.JFrame {
         JPanelContenedor.repaint();
         JPanelContenedor.revalidate();
         JMenuPrincipal.setVisible(true);
+        
+        TxTIngresarNombre.setText("");
     }//GEN-LAST:event_JMIBuscarMateriaActionPerformed
 
     private void JPerfilActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_JPerfilActionPerformed
@@ -1038,6 +999,7 @@ public class JFPrincipal extends javax.swing.JFrame {
         JPanelContenedor.revalidate();
         JMenuPrincipal.setVisible(true);
         
+        JPRAcmbAsistencia.setSelectedIndex(0);
         actualizarTodo();
     }//GEN-LAST:event_JMIAsistenciaActionPerformed
 
@@ -1048,6 +1010,7 @@ public class JFPrincipal extends javax.swing.JFrame {
         JPanelContenedor.revalidate();
         JMenuPrincipal.setVisible(true);
         
+        JPRNnudNota.setValue(0);
         actualizarTodo();
     }//GEN-LAST:event_JMINotasActionPerformed
 
@@ -1057,6 +1020,13 @@ public class JFPrincipal extends javax.swing.JFrame {
         JPanelContenedor.repaint();
         JPanelContenedor.revalidate();
         JMenuPrincipal.setVisible(true);
+        
+        DefaultTableModel modelo = (javax.swing.table.DefaultTableModel) JTResultado.getModel();
+        modelo.setRowCount(0);
+        JPRlblaux1.setText("-");
+        JPRlblaux2.setText("-");
+        JPRlblaux3.setText("-");
+        JPRlblaux4.setText("-");
     }//GEN-LAST:event_JMIReportesActionPerformed
 
     private void JMISalirActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_JMISalirActionPerformed
@@ -1102,8 +1072,17 @@ public class JFPrincipal extends javax.swing.JFrame {
 
     private void JPBMbtnDarBajaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_JPBMbtnDarBajaActionPerformed
         int indiceSeleccionado = JPBMlstMateria.getSelectedIndex();
-
-        controlador.eliminarMateriaPorIndice(indiceSeleccionado);
+        int respuesta = JOptionPane.showConfirmDialog(
+            this, 
+            "¿Está seguro de que desea dar de baja la materia '" + JPBMlstMateria.getSelectedValue() + "'?", 
+            "Confirmar Baja", 
+            JOptionPane.YES_NO_OPTION, 
+            JOptionPane.QUESTION_MESSAGE 
+        );
+        if (respuesta == JOptionPane.YES_OPTION) {
+            controlador.eliminarMateriaPorIndice(indiceSeleccionado);
+        }
+        
     }//GEN-LAST:event_JPBMbtnDarBajaActionPerformed
 
     private void BtnBuscarMateriaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BtnBuscarMateriaActionPerformed
@@ -1135,7 +1114,7 @@ public class JFPrincipal extends javax.swing.JFrame {
         String[] datosLabels = (String[]) paqueteReporte[1];
 
         String[] nombresColumnas = {"Materia", "Condición", "Asistencia", "Promedio", "Estado"};
-        javax.swing.table.DefaultTableModel modeloTabla = new javax.swing.table.DefaultTableModel(datosTabla, nombresColumnas);
+        DefaultTableModel modeloTabla = new javax.swing.table.DefaultTableModel(datosTabla, nombresColumnas);
 
         JTResultado.setModel(modeloTabla); 
 
@@ -1149,7 +1128,7 @@ public class JFPrincipal extends javax.swing.JFrame {
         Object[][] datosTabla = controlador.generarReporteCriticas();
         
         String[] nombresColumnas = {"Materia", "Condición", "Asistencia", "Promedio", "Estado"};
-        javax.swing.table.DefaultTableModel modeloTabla = new javax.swing.table.DefaultTableModel(datosTabla, nombresColumnas);
+        DefaultTableModel modeloTabla = new javax.swing.table.DefaultTableModel(datosTabla, nombresColumnas);
         JTResultado.setModel(modeloTabla); 
 
         JPRlblaux1.setText("-");
@@ -1165,7 +1144,7 @@ public class JFPrincipal extends javax.swing.JFrame {
         String[] estadisticas = (String[]) paquete[1];
 
         String[] nombresColumnas = {"Materia", "Condición", "Asistencia", "Promedio", "Estado"};
-        javax.swing.table.DefaultTableModel modeloTabla = new javax.swing.table.DefaultTableModel(datosTabla, nombresColumnas);
+        DefaultTableModel modeloTabla = new javax.swing.table.DefaultTableModel(datosTabla, nombresColumnas);
         JTResultado.setModel(modeloTabla);
 
         JPRlblaux1.setText(estadisticas[2]); 
