@@ -5,7 +5,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 
 public class Estudiante extends PersonaAcademica implements Consultable {
-
+    
     private static final long serialVersionUID = 1L;
     private String carrera;
     private int anioIngreso;

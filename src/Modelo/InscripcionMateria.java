@@ -3,7 +3,9 @@ package Modelo;
 import java.util.ArrayList;
 import java.io.Serializable;
 
-public class InscripcionMateria implements Evaluable, Rankeable {
+public class InscripcionMateria implements Evaluable, Rankeable, Serializable {
+    
+    private static final long serialVersionUID = 1L;
     //Atributos
     private Materia materia;
     private int totalClases ;
@@ -43,11 +45,13 @@ public class InscripcionMateria implements Evaluable, Rankeable {
     public void agregarNota(double nota){
         if (nota < 0 || nota > 10){
             System.out.println("Error: la nota solo puede tener un valor entre 0-10");
-            return;
+            throw new IllegalArgumentException("La nota solo puede tener un valor entre 0-10");
+            //return;
         }
         if (this.notas.size() >= 5){
             System.out.println("Error: no se pueden registrar mas de 5 notas por materia");
-            return;
+            throw new IllegalArgumentException("Error: No se pueden cargar más de 5 notas por materia");
+            //return;
         }
         this.notas.add(nota);
         System.out.println("Nota registrada con exito");
@@ -112,5 +116,9 @@ public class InscripcionMateria implements Evaluable, Rankeable {
         return (getPromedio() * 0.6) + ((asistenciaPorcentaje / 10) * 0.4);
         //se divide asistenciaPorcentaje por 10 para que el puntaje
         //esté en la escala 0-10
+    }
+    
+    public ArrayList<Double> getNotas() {
+        return this.notas;
     }
 }

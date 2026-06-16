@@ -4,8 +4,10 @@ package Modelo;
 import java.util.HashSet;
 import java.io.Serializable;
 
-public class Materia implements Consultable{
+public class Materia implements Consultable, Serializable{
 
+    private static final long serialVersionUID = 1L;
+    
     private String nombre;
     private String codigo;
     private int cuatrimestre;
@@ -14,10 +16,10 @@ public class Materia implements Consultable{
     private static HashSet<String> codigosRegistrados = new HashSet<>();
 
     public Materia(String nombre, String codigo, int cuatrimestre, int anio) {
-        this.nombre = nombre;
-        this.codigo = codigo;
-        this.cuatrimestre = cuatrimestre;
-        this.anio = anio;
+        setNombre(nombre);
+        setCodigo(codigo); 
+        setCuatrimestre(cuatrimestre);
+        setAnio(anio);
     }
 
     public String getNombre() {

@@ -2,7 +2,7 @@
 package Modelo;
 import java.io.Serializable;
 
-abstract public class PersonaAcademica {
+abstract public class PersonaAcademica implements Serializable{
     //Atributos
     private String nombre;
     private String legajo;
