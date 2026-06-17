@@ -7,16 +7,23 @@ import java.util.ArrayList;
 import DAOEstudiante.DAOEstudiante;
 import Vista.JFPrincipal;
 import Modelo.Materia;
+import DAOEstudiante.DAOMateria;
+
+
 
 public class ControladorEstudiante {
     private DAOEstudiante dao;
+    private DAOMateria daoMateria;
     private Estudiante estudiante;
+    private ArrayList<Materia> materiasGlobales;
     private JFPrincipal vista; 
     
     public ControladorEstudiante(JFPrincipal vista) {
         this.dao = new DAOEstudiante();
         this.estudiante = dao.cargarEstudiante();
         this.vista = vista;
+        this.daoMateria = new DAOMateria();
+        this.materiasGlobales = daoMateria.cargarMaterias();
         
         if (this.estudiante == null) {
             this.estudiante = new Estudiante("Juan Pérez", "12345", "Marketing", 2026);
@@ -40,14 +47,21 @@ public class ControladorEstudiante {
             
             int anio = Integer.parseInt(anioTexto);
 
+            
             Materia nuevaMateria = new Materia(nombre, codigo, cuatrimestre, anio);
-            
-            this.estudiante.inscribirse(nuevaMateria);
-            
-            this.dao.guardarEstudiante(this.estudiante);
-            
-            vista.mostrarExito("¡La materia se ha registrado y guardado con éxito!", "Inscripción exitosa");
-
+             
+            if (this.estudiante.inscribirse(nuevaMateria)== true)
+            {
+             this.materiasGlobales.add(nuevaMateria);
+             this.daoMateria.guardarMaterias(this.materiasGlobales);
+             this.dao.guardarEstudiante(this.estudiante);
+             vista.mostrarExito("¡La materia se ha registrado y guardado con éxito!", "Inscripción exitosa"); 
+            }
+            else
+                {
+                   vista.mostrarError("Ya existe una materia con este código."); 
+                }
+          
         } catch (NumberFormatException e) {
             vista.mostrarError("El campo 'Año' debe ser un número entero válido.");
         } catch (IllegalArgumentException e) {
@@ -67,24 +81,39 @@ public class ControladorEstudiante {
 
 
     public void eliminarMateriaPorIndice(int indiceSeleccionado) {
-        try {
-            if (indiceSeleccionado == -1) {
-                vista.mostrarError("Por favor, seleccione una materia de la lista para darla de baja.");
-                return;
-            }
-
-            this.estudiante.getMaterias().remove(indiceSeleccionado);
-
-            this.dao.guardarEstudiante(this.estudiante);
-
-            vista.mostrarExito("La materia ha sido dada de baja correctamente.", "Eliminación exitosa");
-
-            vista.actualizarPantallaResumen();
-
-        } catch (Exception e) {
-            vista.mostrarError("Ocurrió un error inesperado al eliminar: " + e.getMessage());
+    try {
+        if (indiceSeleccionado == -1) {
+            vista.mostrarError("Por favor, seleccione una materia de la lista para darla de baja.");
+            return;
         }
+
+        // 1. Obtener la inscripción y la materia asociada antes de borrarla del estudiante
+        Modelo.InscripcionMateria inscripcion = this.estudiante.getMaterias().get(indiceSeleccionado);
+        Modelo.Materia materiaABorrar = inscripcion.getMateria();
+        String codigoABorrar = materiaABorrar.getCodigo();
+
+        // 2. Dar de baja al estudiante (remover de su lista local) y actualizar DatosEstudiante.txt
+        this.estudiante.getMaterias().remove(indiceSeleccionado);
+        this.dao.guardarEstudiante(this.estudiante);
+
+        // 3. Eliminar la materia de la lista global del sistema usando el código
+        // removeIf recorre la lista y elimina el elemento que coincida con la condición
+        this.materiasGlobales.removeIf(materia -> materia.getCodigo().equals(codigoABorrar));
+
+        // 4. Guardar la lista global actualizada en DatosMateria.txt
+        this.daoMateria.guardarMaterias(this.materiasGlobales);
+
+        // 5. [Opcional] Liberar el código para que pueda volver a usarse en el futuro
+        Modelo.Materia.liberarCodigo(codigoABorrar);
+
+        vista.mostrarExito("La materia ha sido dada de baja del estudiante y eliminada del sistema correctamente.", "Eliminación exitosa");
+
+        vista.actualizarPantallaResumen();
+
+    } catch (Exception e) {
+        vista.mostrarError("Ocurrió un error inesperado al eliminar: " + e.getMessage());
     }
+}
     
     public String buscarMateria(String criterio, String tipoBusqueda) {
         

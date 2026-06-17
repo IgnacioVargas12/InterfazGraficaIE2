@@ -30,22 +30,24 @@ public class Estudiante extends PersonaAcademica implements Consultable {
         System.out.println("Materias: " + materias.size());
     }
     
-    public void inscribirse(Materia nuevaMateria) 
+    public boolean inscribirse(Materia nuevaMateria) 
     {
-        if (nuevaMateria == null) return;
+        if (nuevaMateria == null) return false;
 
         for (InscripcionMateria ins : materias) 
             {
             if (ins.getMateria().getCodigo().equalsIgnoreCase(nuevaMateria.getCodigo())) 
             {
                 System.out.println("Error: Ya estas inscripto en " + nuevaMateria.getNombre());
-                return; 
+                return false; 
             }
         }
         InscripcionMateria nuevaInscripcion = new InscripcionMateria(nuevaMateria);
-        this.materias.add(nuevaInscripcion);
-
+        this.materias.add(nuevaInscripcion); 
         System.out.println("Inscripcion exitosa a: " + nuevaMateria.getNombre());
+        return true;
+
+        
     }
     
     

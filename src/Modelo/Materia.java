@@ -77,4 +77,9 @@ public class Materia implements Consultable, Serializable{
         System.out.println("Cuatrimestre: " + cuatrimestre);
         System.out.println("Anio: " + anio);
     }
+    public static void liberarCodigo(String codigo) {
+    if (codigo != null) {
+        codigosRegistrados.remove(codigo);
+    }
+}
 }
