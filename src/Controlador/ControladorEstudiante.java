@@ -8,6 +8,8 @@ import DAOEstudiante.DAOEstudiante;
 import Vista.JFPrincipal;
 import Modelo.Materia;
 import DAOEstudiante.DAOMateria;
+import DAOEstudiante.DAOInscripcionMateria;
+
 
 
 
@@ -17,6 +19,7 @@ public class ControladorEstudiante {
     private Estudiante estudiante;
     private ArrayList<Materia> materiasGlobales;
     private JFPrincipal vista; 
+    private DAOInscripcionMateria daoInscripcion;
     
     public ControladorEstudiante(JFPrincipal vista) {
         this.dao = new DAOEstudiante();
@@ -24,11 +27,19 @@ public class ControladorEstudiante {
         this.vista = vista;
         this.daoMateria = new DAOMateria();
         this.materiasGlobales = daoMateria.cargarMaterias();
+        this.daoInscripcion = new DAOInscripcionMateria();
         
         if (this.estudiante == null) {
             this.estudiante = new Estudiante("Juan Pérez", "12345", "Marketing", 2026);
+        }  else {
+
+        ArrayList<InscripcionMateria> inscripcionesGuardadas = daoInscripcion.cargarInscripciones();
+        if (!inscripcionesGuardadas.isEmpty())
+        {
+            
         }
     }
+}
     
     public Estudiante getEstudiante() {
         return this.estudiante;
@@ -55,6 +66,7 @@ public class ControladorEstudiante {
              this.materiasGlobales.add(nuevaMateria);
              this.daoMateria.guardarMaterias(this.materiasGlobales);
              this.dao.guardarEstudiante(this.estudiante);
+             this.daoInscripcion.guardarInscripciones(this.estudiante.getMaterias());
              vista.mostrarExito("¡La materia se ha registrado y guardado con éxito!", "Inscripción exitosa"); 
             }
             else
@@ -87,23 +99,16 @@ public class ControladorEstudiante {
             return;
         }
 
-        // 1. Obtener la inscripción y la materia asociada antes de borrarla del estudiante
+
         Modelo.InscripcionMateria inscripcion = this.estudiante.getMaterias().get(indiceSeleccionado);
         Modelo.Materia materiaABorrar = inscripcion.getMateria();
         String codigoABorrar = materiaABorrar.getCodigo();
 
-        // 2. Dar de baja al estudiante (remover de su lista local) y actualizar DatosEstudiante.txt
         this.estudiante.getMaterias().remove(indiceSeleccionado);
         this.dao.guardarEstudiante(this.estudiante);
-
-        // 3. Eliminar la materia de la lista global del sistema usando el código
-        // removeIf recorre la lista y elimina el elemento que coincida con la condición
         this.materiasGlobales.removeIf(materia -> materia.getCodigo().equals(codigoABorrar));
-
-        // 4. Guardar la lista global actualizada en DatosMateria.txt
         this.daoMateria.guardarMaterias(this.materiasGlobales);
-
-        // 5. [Opcional] Liberar el código para que pueda volver a usarse en el futuro
+        this.daoInscripcion.guardarInscripciones(this.estudiante.getMaterias());
         Modelo.Materia.liberarCodigo(codigoABorrar);
 
         vista.mostrarExito("La materia ha sido dada de baja del estudiante y eliminada del sistema correctamente.", "Eliminación exitosa");
@@ -166,6 +171,7 @@ public class ControladorEstudiante {
             }
 
             this.dao.guardarEstudiante(this.estudiante);
+            this.daoInscripcion.guardarInscripciones(this.estudiante.getMaterias());
 
             resultado[0] = "Asistencia (" + estadoAsistencia + ") cargada con éxito en " + inscripcion.getMateria().getNombre() + ".";
 
@@ -195,6 +201,7 @@ public class ControladorEstudiante {
             inscripcion.agregarNota(notaCargada); 
 
             this.dao.guardarEstudiante(this.estudiante);
+            this.daoInscripcion.guardarInscripciones(this.estudiante.getMaterias());
 
             vista.mostrarExito("Nota cargada registrada con éxito en "+ inscripcion.getMateria().getNombre(), "Nota registrada");
 

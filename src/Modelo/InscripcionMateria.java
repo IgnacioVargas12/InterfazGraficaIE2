@@ -121,4 +121,12 @@ public class InscripcionMateria implements Evaluable, Rankeable, Serializable {
     public ArrayList<Double> getNotas() {
         return this.notas;
     }
+    
+public void setTotalClases(int totalClases) {
+    this.totalClases = totalClases;
+}
+
+public void setClasesAsistidas(int clasesAsistidas) {
+    this.clasesAsistidas = clasesAsistidas;
+}
 }
